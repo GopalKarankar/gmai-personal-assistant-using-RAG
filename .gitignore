@@ -1,0 +1,41 @@
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+
+# Frontend (Vite / React)
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+frontend/*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Backend (Python / FastAPI)
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.coverage
+backend/htmlcov/
+backend/coverage.xml
+backend/.venv/
+backend/venv/
+backend/env/
+
+# Local application data
+backend/qdrant_storage/
+backend/qdrant_data/
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

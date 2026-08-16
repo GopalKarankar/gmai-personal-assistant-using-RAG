@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+qdrant-client==1.18.0
+python-dotenv
+langchain-core
+langchain-text-splitters
+langchain-nvidia-ai-endpoints
+httpx
+python-multipart

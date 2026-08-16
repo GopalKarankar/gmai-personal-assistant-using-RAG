@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: gmail-personal-assistant-backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: CORS_ORIGINS
+        value: https://gmail-personal-assistant-frontend.onrender.com
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+
+  - type: web
+    name: gmail-personal-assistant-frontend
+    env: docker
+    dockerfilePath: frontend/Dockerfile
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: VITE_BACKEND_URL
+        value: https://gmail-personal-assistant-backend.onrender.com
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false
