@@ -390,10 +390,18 @@ def answer_with_groq(question: str, context: list[dict[str, Any]]) -> str:
         )
         response.raise_for_status()
         answer = response.json()["choices"][0]["message"]["content"].strip()
-    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
+    except httpx.HTTPStatusError as exc:
+        logger.exception("Groq request failed with status %d (context size: %d)", exc.response.status_code, len(context))
+        error_body = exc.response.text[:500] if exc.response.text else ""
         raise HTTPException(
             status_code=502,
-            detail="Groq could not generate an answer. Please retry.",
+            detail=f"Groq request failed: {exc.response.status_code} {error_body}",
+        ) from exc
+    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
+        logger.exception("Groq request error (context size: %d)", len(context))
+        raise HTTPException(
+            status_code=502,
+            detail=f"Groq request failed: {str(exc)[:500]}",
         ) from exc
 
     if not answer:
