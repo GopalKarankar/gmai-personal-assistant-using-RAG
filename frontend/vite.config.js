@@ -11,4 +11,8 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] }),
   ],
+  server: {
+    allowedHosts: ["gmail-pa-frontend.onrender.com"],
+    host: "0.0.0.0"
+  }
 })
