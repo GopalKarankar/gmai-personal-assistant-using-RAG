@@ -7,4 +7,4 @@ langchain-text-splitters
 langchain-nvidia-ai-endpoints
 httpx
 python-multipart
-guvicorn
+
