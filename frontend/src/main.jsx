@@ -8,6 +8,8 @@ import { getRuntimeEnv } from "./config/runtimeEnv";
 
 const googleClientId = getRuntimeEnv("VITE_GOOGLE_CLIENT_ID", "");
 
+console.log("Google client ID : ",import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
