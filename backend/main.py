@@ -76,7 +76,7 @@ QDRANT_UPSERT_BATCH_SIZE = max(1, int(os.getenv("QDRANT_UPSERT_BATCH_SIZE", "10"
 QDRANT_UPSERT_RETRIES = max(1, int(os.getenv("QDRANT_UPSERT_RETRIES", "3")))
 CHAT_CONTEXT_LIMIT = max(1, int(os.getenv("CHAT_CONTEXT_LIMIT", "30")))
 GROQ_TIMEOUT_SECONDS = int(os.getenv("GROQ_TIMEOUT_SECONDS", "60"))
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 CLEANUP_SECRET = os.getenv("CLEANUP_SECRET")
 
 class ChatRequest(BaseModel):
@@ -377,15 +377,18 @@ def answer_with_groq(question: str, context: list[dict[str, Any]]) -> str:
     ]
 
     try:
+        payload = {
+            "model": GROQ_MODEL,
+            "messages": messages,
+            "temperature": 0.2,
+            "max_tokens": 600,
+        }
+        if GROQ_MODEL.startswith("openai/gpt-oss"):
+            payload["reasoning_effort"] = "low"
         response = httpx.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}"},
-            json={
-                "model": GROQ_MODEL,
-                "messages": messages,
-                "temperature": 0.2,
-                "max_tokens": 600,
-            },
+            json=payload,
             timeout=GROQ_TIMEOUT_SECONDS,
         )
         response.raise_for_status()
