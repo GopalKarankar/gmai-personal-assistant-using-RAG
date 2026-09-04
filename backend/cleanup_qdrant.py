@@ -13,7 +13,7 @@ client = QdrantClient(
 collection = os.getenv("QDRANT_COLLECTION")
 
 # Use the same vector size your application uses
-VECTOR_SIZE = 384
+VECTOR_SIZE = int(os.getenv("QDRANT_VECTOR_SIZE", "2048"))
 
 client.delete_collection(collection)
 

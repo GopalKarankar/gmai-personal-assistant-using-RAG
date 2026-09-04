@@ -1,5 +1,6 @@
 import importlib
 import json
+import logging
 import os
 import time
 import uuid
@@ -10,6 +11,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 
 def _load_optional_dependencies() -> tuple[Any, Any, Any, Any, Any, Any, Any, Any, Any]:
@@ -66,7 +69,7 @@ load_dotenv()
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "gmail_messages")
-VECTOR_SIZE = int(os.getenv("QDRANT_VECTOR_SIZE", "1024"))
+VECTOR_SIZE = int(os.getenv("QDRANT_VECTOR_SIZE", "2048"))
 MAX_MESSAGES_PER_UPLOAD = int(os.getenv("MAX_MESSAGES_PER_UPLOAD", "50"))
 QDRANT_TIMEOUT_SECONDS = int(os.getenv("QDRANT_TIMEOUT_SECONDS", "120"))
 QDRANT_UPSERT_BATCH_SIZE = max(1, int(os.getenv("QDRANT_UPSERT_BATCH_SIZE", "10")))
@@ -252,15 +255,17 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
         )
 
     embeddings = NVIDIAEmbeddings(
-        model=os.getenv("NVIDIA_EMBEDDING_MODEL", "nvidia/nv-embedqa-e5-v5"),
+        model=os.getenv("NVIDIA_EMBEDDING_MODEL", "nvidia/nemotron-3-embed-1b"),
         api_key=api_key,
+        truncate="END",
     )
     try:
         vectors = embeddings.embed_documents(texts)
     except Exception as exc:
+        logger.exception("NVIDIA embed_documents failed for %d texts", len(texts))
         raise HTTPException(
             status_code=502,
-            detail="NVIDIA embedding generation failed.",
+            detail=f"NVIDIA embedding generation failed: {str(exc)[:500]}",
         ) from exc
 
     if len(vectors) != len(texts):
